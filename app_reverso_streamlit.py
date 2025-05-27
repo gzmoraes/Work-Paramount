@@ -25,30 +25,44 @@ with col1:
     st.subheader("🧵 Produto 1")
     produto1 = st.selectbox("Produto 1", sorted(dados["PRODUTO"].unique()), key="produto1")
     meta1 = st.number_input("Meta Produto 1 (kg)", min_value=1, step=1000, key="meta1")
+    operacoes1 = dados[dados["PRODUTO"] == produto1]["OPERAÇÃO"].unique()
+    operacao1 = st.selectbox("⚙️ Operação Produto 1", sorted(operacoes1), key="operacao1")
+    maquinas1 = st.number_input("🏭 Quantidade de máquinas Produto 1", min_value=1, step=1, key="maquinas1")
 
 with col2:
     st.subheader("🧵 Produto 2")
     produto2 = st.selectbox("Produto 2", sorted(dados["PRODUTO"].unique()), key="produto2")
     meta2 = st.number_input("Meta Produto 2 (kg)", min_value=1, step=1000, key="meta2")
+    operacoes2 = dados[dados["PRODUTO"] == produto2]["OPERAÇÃO"].unique()
+    operacao2 = st.selectbox("⚙️ Operação Produto 2", sorted(operacoes2), key="operacao2")
+    maquinas2 = st.number_input("🏭 Quantidade de máquinas Produto 2", min_value=1, step=1, key="maquinas2")
 
-# === Seleção da operação (comum aos dois) ===
-operacoes = dados[dados["PRODUTO"] == produto1]["OPERAÇÃO"].unique()
-operacao = st.selectbox("⚙️ Selecione a operação (comum)", sorted(operacoes))
+# === Dados da operação para cada produto ===
+linha1 = dados[(dados["PRODUTO"] == produto1) & (dados["OPERAÇÃO"] == operacao1)].iloc[0]
+fusos_total1 = int(linha1["N° FUSOS"])
+kg_por_hora1 = float(str(linha1["KG/MH"]).replace(",", "."))
 
-# === Dados da operação (assume-se que são iguais para os dois produtos) ===
-linha = dados[(dados["PRODUTO"] == produto1) & (dados["OPERAÇÃO"] == operacao)].iloc[0]
-fusos_total = int(linha["N° FUSOS"])
-kg_por_hora = float(str(linha["KG/MH"]).replace(",", "."))
+linha2 = dados[(dados["PRODUTO"] == produto2) & (dados["OPERAÇÃO"] == operacao2)].iloc[0]
+fusos_total2 = int(linha2["N° FUSOS"])
+kg_por_hora2 = float(str(linha2["KG/MH"]).replace(",", "."))
 
-# === Entradas comuns ===
-fusos_parados = st.slider(f"🛑 Fusos parados (máx: {fusos_total})", 0, fusos_total, step=1)
-eficiencia_maquina = st.slider(f"🛠️ Eficiência Máquina (%)", 100, 0, step=1)
-maquinas = st.number_input("🏭 Quantidade de máquinas", min_value=1, step=1)
+# === Fusos e Eficiência ===
+colf1, colf2 = st.columns(2)
+
+with colf1:
+    fusos_parados1 = st.slider(f"🛑 Fusos parados {produto1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
+    eficiencia_maquina1 = st.slider(f"🛠️ Eficiência Máquina {produto1} (%)", 0, 100, 100, step=1, key="ef1")
+
+with colf2:
+    fusos_parados2 = st.slider(f"🛑 Fusos parados {produto2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
+    eficiencia_maquina2 = st.slider(f"🛠️ Eficiência Máquina {produto2} (%)", 0, 100, 100, step=1, key="ef2")
+
+# === Pausas e pico ===
 almoco = st.radio("🍽️ Pausa para almoço?", ["Sim", "Não"]) == "Sim"
 pico = st.radio("📈 Pico no turno B?", ["Sim", "Não"]) == "Sim"
 
 # === Função de simulação ===
-def simular(meta, produto):
+def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, eficiencia_maquina, maquinas):
     fusos_ativos = fusos_total - fusos_parados
     eficiencia = fusos_ativos / fusos_total
     percent_maquina = eficiencia_maquina / 100
@@ -109,8 +123,8 @@ def simular(meta, produto):
 
 # === Cálculo e Exibição ===
 if st.button("🔍 Calcular Simulações"):
-    resultado1 = simular(meta1, produto1)
-    resultado2 = simular(meta2, produto2)
+    resultado1 = simular(meta1, produto1, operacao1, fusos_total1, kg_por_hora1, fusos_parados1, eficiencia_maquina1, maquinas1)
+    resultado2 = simular(meta2, produto2, operacao2, fusos_total2, kg_por_hora2, fusos_parados2, eficiencia_maquina2, maquinas2)
 
     if resultado1 or resultado2:
         colres1, colres2 = st.columns(2)
@@ -126,49 +140,68 @@ if st.button("🔍 Calcular Simulações"):
 
         if resultado2:
             with colres2:
-                st.subheader(f"Resultado: {produto2}")
+                st.subheader(f"✅ Resultado: {produto2}")
                 st.metric("Eficiência Fusos (%)", f"{resultado2['metricas']['Eficiência Fusos (%)']:.2f}%")
                 st.metric("Eficiência Máquina (%)", f"{resultado2['metricas']['Eficiência Máquina (%)']:.2f}%")
                 st.metric("Turnos Necessários", resultado2["metricas"]["Turnos"])
                 st.metric("Dias de Produção", resultado2["metricas"]["Dias"])
                 st.metric("Produção Estimada (kg)", f"{resultado2['metricas']['Produção (kg)']:.0f}")
 
- 
-        dias_total = resultado1["metricas"]["Dias"] + resultado2["metricas"]["Dias"] + 1
+        dias_total = (resultado1["metricas"]["Dias"] if resultado1 else 0) + \
+                     (resultado2["metricas"]["Dias"] if resultado2 else 0) + 1
 
         total_df = pd.DataFrame([{
-        "Produto": "TOTAL",
-        "Dias Necessários": dias_total
+            "Produto": "TOTAL",
+            "Dias Necessários": dias_total
         }])
 
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: center; margin-top: 2em;">
-                <div style="background-color: #ff4d4d; padding: 20px 40px; border-radius: 10px; text-align: center; color: white;">
-                    <h2 style="margin: 0;">📅 Dias Necessários</h2>
-                    <p style="font-size: 36px; font-weight: bold; margin: 10px 0 0 0;">{dias_total}</p>
-                </div>
-            </div><br>
-            """,
-            unsafe_allow_html=True
-        )
-
+        if dias_total > diasMax:
+            st.markdown(
+                f"""
+                <div style="display: flex; justify-content: center; margin-top: 2em;">
+                    <div style="background-color: #ff4d4d; padding: 20px 40px; border-radius: 10px; text-align: center; color: white;">
+                        <h2 style="margin: 0;">⚠️ Limite Excedido</h2><br>
+                        <p style="margin: 0;">Dias úteis necessários ultrapassam o máximo definido ({diasMax})</p>
+                        <p style="font-size: 36px; font-weight: bold; margin: 10px 0 0 0;">{dias_total} dias</p>
+                    </div>
+                </div><br>
+                """,
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                f"""
+                <div style="display: flex; justify-content: center; margin-top: 2em;">
+                    <div style="background-color: #29a329; padding: 20px 40px; border-radius: 10px; text-align: center; color: white;">
+                        <h2 style="margin: 0;">✅ Dentro do Limite</h2>
+                        <p style="margin: 0;">Dias úteis necessários</p>
+                        <p style="font-size: 36px; font-weight: bold; margin: 10px 0 0 0;">{dias_total} dias</p>
+                    </div>
+                </div><br>
+                """,
+                unsafe_allow_html=True
+            )
 
 
         # === Exportação Excel ===
-        if resultado1 and resultado2:
-            output = io.BytesIO()
-            resultado_final = pd.concat([resultado1["dados"], resultado2["dados"], total_df], ignore_index=True)
+        output = io.BytesIO()
+        frames = []
+        if resultado1:
+            frames.append(resultado1["dados"])
+        if resultado2:
+            frames.append(resultado2["dados"])
+        frames.append(total_df)
 
+        resultado_final = pd.concat(frames, ignore_index=True)
 
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                resultado_final.to_excel(writer, index=False, sheet_name="Simulação Total")
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            resultado_final.to_excel(writer, index=False, sheet_name="Simulação Total")
 
-            st.download_button(
-                label="📥 Exportar ambos resultados em Excel",
-                data=output.getvalue(),
-                file_name=f"simulacao_produção{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        st.download_button(
+            label="📥 Exportar resultados em Excel",
+            data=output.getvalue(),
+            file_name=f"simulacao_producao_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
     else:
         st.warning("⚠️ Nenhum dos produtos atinge a meta com os parâmetros fornecidos.")
