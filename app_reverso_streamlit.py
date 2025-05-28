@@ -36,25 +36,25 @@ col1, col2 = st.columns(2)
 with col1:
     st.subheader("🧵 Produto 1")
     produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
-    meta1 = st.number_input("🎯 Meta Produto 1 (kg)", min_value=1, step=1000, key="meta1")
+    meta1 = st.number_input("🎯 Meta (kg)", min_value=1, step=1000, key="meta1")
     operacoes1 = dados[dados["PRODUTO"] == produto1]["OPERAÇÃO"].unique()
-    operacao1 = st.selectbox("⚙️ Operação Produto 1", sorted(operacoes1), key="operacao1")
-    maquinas1 = st.number_input("🏭 Quantidade de máquinas Produto 1", min_value=1, step=1, key="maquinas1")
-    almoco1 = st.radio("🍽️ Pausa para almoço Produto 1?", ["Sim", "Não"], key="almoco1") == "Sim"
-    pico1 = st.radio("📈 Pico no turno B Produto 1?", ["Sim", "Não"], key="pico1") == "Sim"
-    turnos1 = st.multiselect("🕐 Turnos Produto 1", ["A", "B", "C"], default=["A", "B", "C"], key="turnos1")
+    operacao1 = st.selectbox("⚙️ Operação", sorted(operacoes1), key="operacao1")
+    maquinas1 = st.number_input("🏭 Quantidade de máquinas", min_value=1, step=1, key="maquinas1")
+    almoco1 = st.radio("🍽️ Pausa para almoço?", ["Sim", "Não"], key="almoco1") == "Sim"
+    pico1 = st.radio("📈 Pico no turno B?", ["Sim", "Não"], key="pico1") == "Sim"
+    turnos1 = st.multiselect("🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key="turnos1")
 
 # --- Entradas para o Produto 2 ---
 with col2:
     st.subheader("🧵 Produto 2")
     produto2 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto2")
-    meta2 = st.number_input("🎯 Meta Produto 2 (kg)", min_value=1, step=1000, key="meta2")
+    meta2 = st.number_input("🎯 Meta (kg)", min_value=1, step=1000, key="meta2")
     operacoes2 = dados[dados["PRODUTO"] == produto2]["OPERAÇÃO"].unique()
-    operacao2 = st.selectbox("⚙️ Operação Produto 2", sorted(operacoes2), key="operacao2")
-    maquinas2 = st.number_input("🏭 Quantidade de máquinas Produto 2", min_value=1, step=1, key="maquinas2")
-    almoco2 = st.radio("🍽️ Pausa para almoço Produto 2?", ["Sim", "Não"], key="almoco2") == "Sim"
-    pico2 = st.radio("📈 Pico no turno B Produto 2?", ["Sim", "Não"], key="pico2") == "Sim"
-    turnos2 = st.multiselect("🕐 Turnos Produto 2", ["A", "B", "C"], default=["A", "B", "C"], key="turnos2")
+    operacao2 = st.selectbox("⚙️ Operação", sorted(operacoes2), key="operacao2")
+    maquinas2 = st.number_input("🏭 Quantidade de máquinas", min_value=1, step=1, key="maquinas2")
+    almoco2 = st.radio("🍽️ Pausa para almoço?", ["Sim", "Não"], key="almoco2") == "Sim"
+    pico2 = st.radio("📈 Pico no turno B?", ["Sim", "Não"], key="pico2") == "Sim"
+    turnos2 = st.multiselect("🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key="turnos2")
 
 # Função para buscar dados da operação de um produto
 def get_operacao(produto, operacao):
@@ -81,12 +81,12 @@ fusos_total2, kg_por_hora2 = dados2
 colf1, colf2 = st.columns(2)
 
 with colf1:
-    fusos_parados1 = st.slider(f"🛑 Fusos parados {produto1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
-    eficiencia_maquina1 = st.slider(f"🛠️ Eficiência Máquina {produto1} (%)", 0, 100, 100, step=1, key="ef1")
+    fusos_parados1 = st.slider(f"🛑 Fusos parados {operacao1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
+    eficiencia_maquina1 = st.slider(f"🛠️ Eficiência Máquina {operacao1} (%)", 0, 100, 100, step=1, key="ef1")
 
 with colf2:
-    fusos_parados2 = st.slider(f"🛑 Fusos parados {produto2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
-    eficiencia_maquina2 = st.slider(f"🛠️ Eficiência Máquina {produto2} (%)", 0, 100, 100, step=1, key="ef2")
+    fusos_parados2 = st.slider(f"🛑 Fusos parados {operacao2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
+    eficiencia_maquina2 = st.slider(f"🛠️ Eficiência Máquina {operacao2} (%)", 0, 100, 100, step=1, key="ef2")
 
 # Função de simulação de produção
 def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, eficiencia_maquina, maquinas, almoco, pico, turnos_entrada):
@@ -163,7 +163,7 @@ if st.button("🔍 Calcular Simulações"):
             st.metric("Produção diária", f"{producao_dia2:,.2f} kg/dia")
 
     # Cálculo da produção total e dias totais considerando o número de máquinas
-    if maquinas1 == maquinas2:
+    if operacao1 == operacao2:
         dias_total = (resultado1["metricas"]["Dias"] if resultado1 else 0) + (resultado2["metricas"]["Dias"] if resultado2 else 0)
         producao_total = 0
     else:
@@ -173,13 +173,50 @@ if st.button("🔍 Calcular Simulações"):
         )
         producao_total = producao_dia1 + producao_dia2
 
-    st.metric("🔢 Total Diária", f"{producao_total:,.2f} kg/dia")
+    st.subheader("🔢 Total de Produção Diária(Se a máquina for igual não soma)")
+    st.metric("", f"{producao_total:,.2f} kg/dia")
 
     # Verifica se está dentro do limite de dias úteis
     if dias_total > diasMax:
-        st.error(f"⚠️ Limite Excedido: {dias_total} dias (máximo: {diasMax})")
+        st.markdown(
+    f"""
+    <div style="
+        background-color: #f8d7da;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    ">
+        ⚠️ Limite Excedido: {dias_total} dias (Máximo: {diasMax})
+    </div><br>
+    """,
+    unsafe_allow_html=True
+)
+
     else:
-        st.success(f"✅ Dentro do Limite: {dias_total} dias")
+        st.markdown(
+    f"""
+    <div style="
+        background-color: #d4edda;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    ">
+        ✅ Dias Necessários Para Atender o Volume: {dias_total} dias
+    </div><br>
+    """,
+    unsafe_allow_html=True
+)
+
 
     # Exporta os dados para Excel
     output = io.BytesIO()
@@ -201,3 +238,4 @@ if st.button("🔍 Calcular Simulações"):
         file_name=f"simulacao_producao_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    
