@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import io
-
+import os
 # Configurações iniciais da página do Streamlit
 st.set_page_config(page_title="Paramount Têxteis - Santa Isabel", layout="centered")
 
@@ -13,7 +13,8 @@ st.title("Produção - Paramount SI")
 # Carrega os dados da planilha Excel, usando cache para melhorar performance
 @st.cache_data
 def carregar_dados():
-    df = pd.read_excel("Power Bi - PLANTA DE PRODUÇÃO (FIOS  INDUSTRIAIS).xlsx")
+    caminho = os.path.join(os.path.dirname(__file__), "Power Bi - PLANTA DE PRODUÇÃO (FIOS  INDUSTRIAIS).xlsx")
+    df = pd.read_excel(caminho)
     df = df[["PRODUTO", "OPERAÇÃO", "N° FUSOS", "KG/MH"]].dropna()
     return df
 
