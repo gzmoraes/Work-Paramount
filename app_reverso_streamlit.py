@@ -83,12 +83,12 @@ fusos_total2, kg_por_hora2 = dados2
 colf1, colf2 = st.columns(2)
 
 with colf1:
-    fusos_parados1 = st.slider(f"🛑 Fusos parados {operacao1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
-    eficiencia_maquina1 = st.slider(f"🛠️ Eficiência Máquina {operacao1} (%)", 0, 100, 100, step=1, key="ef1")
+    fusos_parados1 = st.number_input(f"🛑 Fusos parados {operacao1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
+    eficiencia_maquina1 = st.number_input(f"🛠️ Eficiência Máquina {operacao1} (%)", 0, 100, 100, step=1, key="ef1")
 
 with colf2:
-    fusos_parados2 = st.slider(f"🛑 Fusos parados {operacao2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
-    eficiencia_maquina2 = st.slider(f"🛠️ Eficiência Máquina {operacao2} (%)", 0, 100, 100, step=1, key="ef2")
+    fusos_parados2 = st.number_input(f"🛑 Fusos parados {operacao2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
+    eficiencia_maquina2 = st.number_input(f"🛠️ Eficiência Máquina {operacao2} (%)", 0, 100, 100, step=1, key="ef2")
 
 # Função de simulação de produção
 def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, eficiencia_maquina, maquinas, almoco, pico, turnos_entrada):
