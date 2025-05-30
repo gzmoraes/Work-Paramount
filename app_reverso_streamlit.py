@@ -25,7 +25,7 @@ dados = carregar_dados()
 # Função para tratar valores numéricos que vêm como string com vírgula
 def parse_float(valor):
     if isinstance(valor, str):
-        return float(valor.replace(",", "."))
+        return float(valor.replace(".", ","))
     return float(valor)
 
 # Input do usuário: número máximo de dias úteis disponíveis
