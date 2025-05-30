@@ -101,10 +101,10 @@ else:
     colunas_exibir = [
         "N° OPERAÇÃO",
         "OPERAÇÃO",
-        f"MAQ HR - {nome1}",
-        f"MAQ HR - {nome2}",
         f"KG/HR - {nome1}",
         f"KG/HR - {nome2}",
+        f"MAQ HR - {nome1}",
+        f"MAQ HR - {nome2}",
         "Diferença (%) MAQ HR"
     ]
     comparativo = comparativo[colunas_exibir]
