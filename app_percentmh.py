@@ -132,7 +132,8 @@ colunas_exibir = [
 if comparativo.empty:
     st.warning("⚠️ Dados insuficientes para gerar o comparativo. Verifique se selecionou corretamente Produto, Revisão e Linha de Produção.")
 else:
-    st.subheader("🔍 Comparativo de MAQ HR por OPERAÇÃO (Ordem de N° de Operação está de acordo com o Produto 1)")
+    st.subheader("🔍 Comparativo de MAQ HR por OPERAÇÃO")
+    st.write("(Ordem de N° de Operação está de acordo com o Produto 1)")
     st.dataframe(comparativo[colunas_exibir], hide_index=True)
 
     # Diferença total ponderada
