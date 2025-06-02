@@ -5,10 +5,11 @@ from datetime import datetime
 import io
 import os
 
-# Título do app
-st.title("Produção - Paramount SI")
+st.set_page_config(page_title="Produção - Paramount SI", layout="wide")
 
-# Carrega os dados da planilha Excel, usando cache para melhorar performance
+st.title("📊 Produção - Paramount SI")
+
+# Carrega os dados da planilha Excel
 @st.cache_data
 def carregar_dados():
     caminho = os.path.join(os.path.dirname(__file__), "Power Bi - PLANTA DE PRODUÇÃO (FIOS  INDUSTRIAIS).xlsx")
@@ -16,46 +17,50 @@ def carregar_dados():
     df = df[["PRODUTO", "OPERAÇÃO", "N° FUSOS", "KG/MH"]].dropna()
     return df
 
-# Carrega os dados da planilha
 dados = carregar_dados()
 
-# Função para tratar valores numéricos que vêm como string com vírgula
+# Função para tratar vírgula e ponto
 def parse_float(valor):
     if isinstance(valor, str):
-        return float(valor.replace(".", ","))
+        return float(valor.replace(",", "."))
     return float(valor)
 
-# Input do usuário: número máximo de dias úteis disponíveis
+# Seleção de quantidade de produtos
+qtd_produtos = st.selectbox("🛠️ Quantidade de produtos para comparar", [1, 2, 3])
+
+# Dias úteis
 diasMax = st.number_input("📆 Max Dias Úteis", min_value=1, max_value=31, step=1)
 
-# Criação de duas colunas para entrada dos dados dos dois produtos
+# Inputs adicionais globais
+st.subheader("⚙️ Ajustes Globais")
 col1, col2 = st.columns(2)
-
-# --- Entradas para o Produto 1 ---
 with col1:
-    st.subheader("🧵 Produto 1")
-    produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
-    meta1 = st.number_input("🎯 Meta (kg)", min_value=1, step=1000, key="meta1")
-    operacoes1 = dados[dados["PRODUTO"] == produto1]["OPERAÇÃO"].unique()
-    operacao1 = st.selectbox("⚙️ Operação", sorted(operacoes1), key="operacao1")
-    maquinas1 = st.number_input("🏭 Quantidade de máquinas", min_value=1, step=1, key="maquinas1")
-    almoco1 = st.radio("🍽️ Pausa para almoço?", ["Sim", "Não"], key="almoco1") == "Sim"
-    pico1 = st.radio("📈 Pico no turno B?", ["Sim", "Não"], key="pico1") == "Sim"
-    turnos1 = st.multiselect("🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key="turnos1")
-
-# --- Entradas para o Produto 2 ---
+    absenteismo = st.number_input("❌ Índice de Absenteísmo (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 100
 with col2:
-    st.subheader("🧵 Produto 2")
-    produto2 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto2")
-    meta2 = st.number_input("🎯 Meta (kg)", min_value=1, step=1000, key="meta2")
-    operacoes2 = dados[dados["PRODUTO"] == produto2]["OPERAÇÃO"].unique()
-    operacao2 = st.selectbox("⚙️ Operação", sorted(operacoes2), key="operacao2")
-    maquinas2 = st.number_input("🏭 Quantidade de máquinas", min_value=1, step=1, key="maquinas2")
-    almoco2 = st.radio("🍽️ Pausa para almoço?", ["Sim", "Não"], key="almoco2") == "Sim"
-    pico2 = st.radio("📈 Pico no turno B?", ["Sim", "Não"], key="pico2") == "Sim"
-    turnos2 = st.multiselect("🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key="turnos2")
+    novatos = st.number_input("🧑‍🏭 Percentual de Novatos (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 200  # divide por 2
 
-# Função para buscar dados da operação de um produto
+# Função para inputs de produtos
+def input_produto(idx):
+    st.subheader(f"🧵 Produto {idx}")
+    produto = st.selectbox(f"Item", sorted(dados["PRODUTO"].unique()), key=f"produto{idx}")
+    meta = st.number_input(f"🎯 Meta (kg)", min_value=1, step=1000, key=f"meta{idx}")
+    operacoes = dados[dados["PRODUTO"] == produto]["OPERAÇÃO"].unique()
+    operacao = st.selectbox(f"⚙️ Operação", sorted(operacoes), key=f"operacao{idx}")
+    maquinas = st.number_input(f"🏭 Quantidade de máquinas", min_value=1, step=1, key=f"maquinas{idx}")
+    almoco = st.radio(f"🍽️ Pausa para almoço?", ["Sim", "Não"], key=f"almoco{idx}") == "Sim"
+    pico = st.radio(f"📈 Pico no turno B?", ["Sim", "Não"], key=f"pico{idx}") == "Sim"
+    turnos = st.multiselect(f"🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key=f"turnos{idx}")
+    return produto, meta, operacao, maquinas, almoco, pico, turnos
+
+# Inputs dos produtos
+colunas = st.columns(qtd_produtos)
+inputs = []
+for i in range(qtd_produtos):
+    with colunas[i]:
+        entrada = input_produto(i + 1)
+        inputs.append(entrada)
+
+# Buscar dados da operação
 def get_operacao(produto, operacao):
     filtro = dados[(dados["PRODUTO"] == produto) & (dados["OPERAÇÃO"] == operacao)]
     if filtro.empty:
@@ -63,40 +68,20 @@ def get_operacao(produto, operacao):
     linha = filtro.iloc[0]
     return int(linha["N° FUSOS"]), parse_float(linha["KG/MH"])
 
-# Busca os dados de operação para cada produto
-dados1 = get_operacao(produto1, operacao1)
-dados2 = get_operacao(produto2, operacao2)
-
-# Validação: se não encontrou os dados, exibe erro
-if dados1 is None or dados2 is None:
-    st.error("⚠️ Dados insuficientes para simular. Verifique se o produto e operação existem na base.")
-    st.stop()
-
-# Extrai os dados de cada operação
-fusos_total1, kg_por_hora1 = dados1
-fusos_total2, kg_por_hora2 = dados2
-
-# Inputs adicionais sobre eficiência e fusos parados
-colf1, colf2 = st.columns(2)
-
-with colf1:
-    fusos_parados1 = st.number_input(f"🛑 Fusos parados {operacao1} (máx: {fusos_total1})", 0, fusos_total1, step=1, key="fuso1")
-    eficiencia_maquina1 = st.number_input(f"🛠️ Eficiência Máquina {operacao1} (%)", 0, 100, 100, step=1, key="ef1")
-
-with colf2:
-    fusos_parados2 = st.number_input(f"🛑 Fusos parados {operacao2} (máx: {fusos_total2})", 0, fusos_total2, step=1, key="fuso2")
-    eficiencia_maquina2 = st.number_input(f"🛠️ Eficiência Máquina {operacao2} (%)", 0, 100, 100, step=1, key="ef2")
-
-# Função de simulação de produção
-def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, eficiencia_maquina, maquinas, almoco, pico, turnos_entrada):
+# Simulação
+def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados,
+            eficiencia_maquina, maquinas, almoco, pico, turnos_entrada,
+            absenteismo, novatos):
+    
     fusos_ativos = fusos_total - fusos_parados
     eficiencia_fusos = fusos_ativos / fusos_total
     eficiencia_maquina = eficiencia_maquina / 100
 
+    fator_ajuste = (1 - absenteismo) * (1 - novatos)
+
     if not turnos_entrada:
         return None
 
-    # Simula de 1 até diasMax para encontrar o menor número de dias que atinge a meta
     for dias in range(1, diasMax + 1):
         total_horas = 0
         for t in turnos_entrada:
@@ -106,8 +91,10 @@ def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, ef
             if t == "B" and pico:
                 h -= 3
             total_horas += h
+
         total_horas *= dias * maquinas
-        producao = total_horas * kg_por_hora * eficiencia_fusos * eficiencia_maquina
+        producao = total_horas * kg_por_hora * eficiencia_fusos * eficiencia_maquina * fator_ajuste
+
         if producao >= meta:
             return {
                 "dados": pd.DataFrame([{
@@ -135,95 +122,134 @@ def simular(meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados, ef
             }
     return None
 
-# Quando o botão é clicado, realiza a simulação
+# Inputs de fusos e eficiência
+colfusos = st.columns(qtd_produtos)
+fusos_parados_list = []
+eficiencia_maquina_list = []
+dados_operacao = []
+
+for i, entrada in enumerate(inputs):
+    produto, meta, operacao, maquinas, almoco, pico, turnos = entrada
+    dados_op = get_operacao(produto, operacao)
+
+    if dados_op is None:
+        st.error(f"⚠️ Dados insuficientes para {produto} - {operacao}. Verifique na base.")
+        st.stop()
+
+    fusos_total, kg_por_hora = dados_op
+    dados_operacao.append((fusos_total, kg_por_hora))
+
+    with colfusos[i]:
+        fusos_parados = st.number_input(
+            f"🛑 Fusos parados {operacao} (máx: {fusos_total})", 0, fusos_total, step=1, key=f"fuso{i}"
+        )
+        eficiencia_maquina = st.number_input(
+            f"🛠️ Eficiência Máquina {operacao} (%)", 0, 100, 100, step=1, key=f"ef{i}"
+        )
+        fusos_parados_list.append(fusos_parados)
+        eficiencia_maquina_list.append(eficiencia_maquina)
+
+# Botão calcular
 if st.button("🔍 Calcular Simulações"):
-    resultado1 = simular(meta1, produto1, operacao1, fusos_total1, kg_por_hora1, fusos_parados1, eficiencia_maquina1, maquinas1, almoco1, pico1, turnos1)
-    resultado2 = simular(meta2, produto2, operacao2, fusos_total2, kg_por_hora2, fusos_parados2, eficiencia_maquina2, maquinas2, almoco2, pico2, turnos2)
+    resultados = []
+    producao_dias = []
 
-    # Calcula produção diária de cada produto
-    producao_dia1 = resultado1["metricas"]["Produção (kg)"] / resultado1["metricas"]["Dias"] if resultado1 else 0
-    producao_dia2 = resultado2["metricas"]["Produção (kg)"] / resultado2["metricas"]["Dias"] if resultado2 else 0
+    for i, entrada in enumerate(inputs):
+        produto, meta, operacao, maquinas, almoco, pico, turnos = entrada
+        fusos_total, kg_por_hora = dados_operacao[i]
+        fusos_parados = fusos_parados_list[i]
+        eficiencia_maquina = eficiencia_maquina_list[i]
 
-    # Mostra os resultados na tela em colunas
-    colres1, colres2 = st.columns(2)
+        resultado = simular(
+            meta, produto, operacao, fusos_total, kg_por_hora, fusos_parados,
+            eficiencia_maquina, maquinas, almoco, pico, turnos,
+            absenteismo, novatos
+        )
+        resultados.append(resultado)
 
-    if resultado1:
-        with colres1:
-            st.subheader(f"✅ Resultado: {produto1}")
-            for k, v in resultado1["metricas"].items():
-                st.metric(k, f"{v:.2f}" if isinstance(v, float) else v)
-            st.metric("Produção diária", f"{producao_dia1:,.2f} kg/dia")
+        if resultado:
+            producao_dia = resultado["metricas"]["Produção (kg)"] / resultado["metricas"]["Dias"]
+        else:
+            producao_dia = 0
+        producao_dias.append(producao_dia)
 
-    if resultado2:
-        with colres2:
-            st.subheader(f"✅ Resultado: {produto2}")
-            for k, v in resultado2["metricas"].items():
-                st.metric(k, f"{v:.2f}" if isinstance(v, float) else v)
-            st.metric("Produção diária", f"{producao_dia2:,.2f} kg/dia")
+    # Mostrar os resultados
+    cols_result = st.columns(qtd_produtos)
+    for i, resultado in enumerate(resultados):
+        if resultado:
+            with cols_result[i]:
+                produto = inputs[i][0]
+                st.subheader(f"✅ Resultado: {produto}")
+                for k, v in resultado["metricas"].items():
+                    st.metric(k, f"{v:.2f}" if isinstance(v, float) else v)
+                st.metric(
+                    "Produção diária",
+                    f"{producao_dias[i]:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " kg/dia"
+                )
 
-    # Cálculo da produção total e dias totais considerando o número de máquinas
-    if operacao1 == operacao2:
-        dias_total = (resultado1["metricas"]["Dias"] if resultado1 else 0) + (resultado2["metricas"]["Dias"] if resultado2 else 0)
+    # Produção total
+    operacoes = [entrada[2] for entrada in inputs]
+    if len(set(operacoes)) == 1:
+        dias_total = sum([resultado["metricas"]["Dias"] if resultado else 0 for resultado in resultados])
         producao_total = 0
     else:
-        dias_total = max(
-            resultado1["metricas"]["Dias"] if resultado1 else 0,
-            resultado2["metricas"]["Dias"] if resultado2 else 0
-        )
-        producao_total = producao_dia1 + producao_dia2
+        dias_total = max([resultado["metricas"]["Dias"] if resultado else 0 for resultado in resultados])
+        producao_total = sum(producao_dias)
 
-    st.subheader("🔢 Total de Produção Diária(Se a máquina for igual não soma)")
-    st.metric("", f"{producao_total:,.2f} kg/dia")
+    st.subheader("🔢 Total de Produção Diária")
+    st.write("(Se as operações forem iguais, não soma a produção diária!)")
+    st.metric(
+        "", f"{producao_total:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " kg/dia"
+    )
 
-    # Verifica se está dentro do limite de dias úteis
+    # Aviso se ultrapassa dias úteis
     if dias_total > diasMax:
         st.markdown(
-    f"""
-    <div style="
-        background-color: #f8d7da;
-        padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #f5c6cb;
-        color: #721c24;
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 20px;
-    ">
-        ⚠️ Limite Excedido: {dias_total} dias (Máximo: {diasMax})
-    </div><br>
-    """,
-    unsafe_allow_html=True
-)
-
+            f"""
+            <div style="
+                background-color: #f8d7da;
+                padding: 20px;
+                border-radius: 10px;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 20px;
+            ">
+                ⚠️ Limite Excedido: {dias_total} dias (Máximo: {diasMax})
+            </div><br>
+            """,
+            unsafe_allow_html=True
+        )
     else:
         st.markdown(
-    f"""
-    <div style="
-        background-color: #d4edda;
-        padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #c3e6cb;
-        color: #155724;
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-        margin-top: 20px;
-    ">
-        ✅ Dias Necessários Para Atender o Volume: {dias_total} dias
-    </div><br>
-    """,
-    unsafe_allow_html=True
-)
+            f"""
+            <div style="
+                background-color: #d4edda;
+                padding: 20px;
+                border-radius: 10px;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                margin-top: 20px;
+            ">
+                ✅ Dias Necessários Para Atender o Volume: {dias_total} dias
+            </div><br>
+            """,
+            unsafe_allow_html=True
+        )
 
-
-    # Exporta os dados para Excel
+    # Exporta para Excel
     output = io.BytesIO()
     frames = []
-    if resultado1:
-        frames.append(resultado1["dados"])
-    if resultado2:
-        frames.append(resultado2["dados"])
+
+    for resultado in resultados:
+        if resultado:
+            frames.append(resultado["dados"])
+
     frames.append(pd.DataFrame([{"Produto": "TOTAL", "Dias Necessários": dias_total}]))
 
     resultado_final = pd.concat(frames, ignore_index=True)
@@ -237,4 +263,3 @@ if st.button("🔍 Calcular Simulações"):
         file_name=f"simulacao_producao_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    
