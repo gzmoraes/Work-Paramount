@@ -5,7 +5,6 @@ import os
 import io
 
 # Configuração da página
-st.set_page_config(page_title="Paramount Têxteis - Santa Isabel", layout="wide")
 st.title("Produção - Paramount SI")
 
 # Função para carregar os dados

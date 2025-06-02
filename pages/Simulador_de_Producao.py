@@ -5,9 +5,6 @@ from datetime import datetime
 import io
 import os
 
-# Configurações iniciais da página do Streamlit
-st.set_page_config(page_title="Paramount Têxteis - Santa Isabel", layout="centered")
-
 # Título do app
 st.title("Produção - Paramount SI")
 
