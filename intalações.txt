@@ -1,3 +1,3 @@
 Bibliotecas:  pip install streamlit pandas openpyxl pyinstaller
 Config: pip install setuptools<81
-Para iniciar o host: streamlit run app_reverso_streamlit.py
+Para iniciar o host: streamlit run HOME.py
