@@ -10,7 +10,7 @@ st.title("Produção - Paramount SI")
 # Função para carregar os dados
 @st.cache_data
 def carregar_dados():
-    caminho = os.path.join(os.path.dirname(__file__), "Power Bi - PLANTA DE PRODUÇÃO (FIOS  INDUSTRIAIS).xlsx")
+    caminho = os.path.join(os.path.dirname(__file__), "PLANTA_DE_PRODUÇÃO(FIOS_INDUSTRIAIS).xlsx")
     df = pd.read_excel(caminho)
     df = df[["PRODUTO", "REVISÃO", "LINHA DE PRODUÇÃO", "OPERAÇÃO", "KG/MH", "MAQ HR", "N° OPERAÇÃO"]].dropna()
     return df
