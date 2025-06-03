@@ -54,21 +54,21 @@ diasMax = st.number_input("📆 Max Dias Úteis", min_value=1, max_value=31, ste
 st.subheader("⚙️ Ajustes Globais")
 col1, col2 = st.columns(2)
 with col1:
-    absenteismo = st.number_input("❌ Índice de Absenteísmo (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 100
+    absenteismo = st.number_input("Índice de Absenteísmo (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 100
 with col2:
-    novatos = st.number_input("🧑‍🏭 Percentual de Novatos (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 200  # divide por 2
+    novatos = st.number_input("Percentual de Novatos (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 200  # divide por 2
 
 # Função para inputs de produtos
 def input_produto(idx):
     st.subheader(f"🧵 Produto {idx}")
     produto = st.selectbox(f"Item", sorted(dados["PRODUTO"].unique()), key=f"produto{idx}")
-    meta = st.number_input(f"🎯 Meta (kg)", min_value=1, step=1000, key=f"meta{idx}")
+    meta = st.number_input(f"Meta (kg)", min_value=1, step=1000, key=f"meta{idx}")
     operacoes = dados[dados["PRODUTO"] == produto]["OPERAÇÃO"].unique()
-    operacao = st.selectbox(f"⚙️ Operação", sorted(operacoes), key=f"operacao{idx}")
-    maquinas = st.number_input(f"🏭 Quantidade de máquinas", min_value=1, step=1, key=f"maquinas{idx}")
-    almoco = st.radio(f"🍽️ Pausa para almoço?", ["Sim", "Não"], key=f"almoco{idx}") == "Sim"
-    pico = st.radio(f"📈 Pico no turno B?", ["Sim", "Não"], key=f"pico{idx}") == "Sim"
-    turnos = st.multiselect(f"🕐 Turnos", ["A", "B", "C"], default=["A", "B", "C"], key=f"turnos{idx}")
+    operacao = st.selectbox(f"Operação", sorted(operacoes), key=f"operacao{idx}")
+    maquinas = st.number_input(f"Quantidade de máquinas", min_value=1, step=1, key=f"maquinas{idx}")
+    almoco = st.radio(f"Pausa para almoço?", ["Sim", "Não"], key=f"almoco{idx}") == "Sim"
+    pico = st.radio(f"Pico no turno B?", ["Sim", "Não"], key=f"pico{idx}") == "Sim"
+    turnos = st.multiselect(f"Turnos", ["A", "B", "C"], default=["A", "B", "C"], key=f"turnos{idx}")
     return produto, meta, operacao, maquinas, almoco, pico, turnos
 
 # Inputs dos produtos
@@ -160,10 +160,10 @@ for i, entrada in enumerate(inputs):
 
     with colfusos[i]:
         fusos_parados = st.number_input(
-            f"🛑 Fusos parados {operacao} (máx: {fusos_total})", 0, fusos_total, step=1, key=f"fuso{i}"
+            f"Fusos parados {operacao} (máx: {fusos_total})", 0, fusos_total, step=1, key=f"fuso{i}"
         )
         eficiencia_maquina = st.number_input(
-            f"🛠️ Eficiência Máquina {operacao} (%)", 0, 100, 100, step=1, key=f"ef{i}"
+            f"Eficiência Máquina {operacao} (%)", 0, 100, 100, step=1, key=f"ef{i}"
         )
         fusos_parados_list.append(fusos_parados)
         eficiencia_maquina_list.append(eficiencia_maquina)

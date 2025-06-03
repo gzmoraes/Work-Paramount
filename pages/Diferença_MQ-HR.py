@@ -6,7 +6,6 @@ import io
 
 st.set_page_config(page_title="Diferença MQ/HR | Paramount Têxteis SI", layout="wide")
 
-# 🎨 Sidebar personalizada
 with st.sidebar:
     st.subheader("ℹ️ Sobre")
     st.info("App desenvolvido para auxiliar na gestão da produção da unidade de Santa Isabel.")
@@ -47,20 +46,20 @@ dados_sem_nulos = dados[dados["LINHA DE PRODUÇÃO"].notna()]
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("🧵 Produto 1")
+    st.subheader("Produto 1")
     produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
     rev1 = sorted(dados[dados["PRODUTO"] == produto1]['REVISÃO'].unique())
-    revisao1 = st.selectbox("⚙️ Revisão da Planta de Produção", rev1, key="revisao1")
+    revisao1 = st.selectbox("Revisão da Planta de Produção", rev1, key="revisao1")
     linha1 = sorted(dados[dados["PRODUTO"] == produto1]['LINHA DE PRODUÇÃO'].unique())
-    linhaProd1 = st.multiselect("🕐 Linha de Produção", linha1, key="linhaProd1")
+    linhaProd1 = st.multiselect("Linha de Produção", linha1, key="linhaProd1")
 
 with col2:
-    st.subheader("🧵 Produto 2")
+    st.subheader("Produto 2")
     produto2 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto2")
     rev2 = sorted(dados[dados["PRODUTO"] == produto2]['REVISÃO'].unique())
     revisao2 = st.selectbox("⚙️ Revisão da Planta de Produção", rev2, key="revisao2")
     linha2 = sorted(dados[dados["PRODUTO"] == produto2]['LINHA DE PRODUÇÃO'].unique())
-    linhaProd2 = st.multiselect("🕐 Linha de Produção", linha2, key="linhaProd2")
+    linhaProd2 = st.multiselect("Linha de Produção", linha2, key="linhaProd2")
 
 # Filtragem de dados
 filtro1 = dados_sem_nulos[
@@ -150,7 +149,7 @@ colunas_exibir = [
 if comparativo.empty:
     st.warning("⚠️ Dados insuficientes para gerar o comparativo. Verifique se selecionou corretamente Produto, Revisão e Linha de Produção.")
 else:
-    st.subheader("🔍 Comparativo de MAQ HR por OPERAÇÃO")
+    st.subheader("Comparativo de MAQ HR por OPERAÇÃO")
     st.write("(Ordem de N° de Operação está de acordo com o Produto 1)")
     st.dataframe(comparativo[colunas_exibir], hide_index=True)
 
@@ -204,7 +203,7 @@ else:
         labelAngle=-45
     )
 
-    st.subheader("📊 Gráfico de Diferença Percentual (MAQ HR)")
+    st.subheader("Gráfico de Diferença Percentual (MAQ HR)")
     st.altair_chart(grafico_diferenca, use_container_width=True)
 
     # Gráfico Comparativo Lado a Lado
@@ -231,7 +230,7 @@ else:
         labelAngle=-45
     )
 
-    st.subheader("📊 Gráfico Comparativo de MAQ HR por Operação")
+    st.subheader("Gráfico Comparativo de MAQ HR por Operação")
     st.altair_chart(grafico_comparativo, use_container_width=True)
 
     # Exportar Excel
