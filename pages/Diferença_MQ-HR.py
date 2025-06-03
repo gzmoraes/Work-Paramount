@@ -23,7 +23,7 @@ with st.sidebar:
 
 
 # Configuração da página
-st.title("Produção - Paramount SI")
+st.title("📊Produção - Paramount SI")
 
 # Função para carregar os dados
 @st.cache_data
@@ -49,7 +49,7 @@ with col1:
     st.subheader("🧵 Produto 1")
     produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
     rev1 = sorted(dados[dados["PRODUTO"] == produto1]['REVISÃO'].unique())
-    revisao1 = st.selectbox("⚙️ Revisão", rev1, key="revisao1")
+    revisao1 = st.selectbox("⚙️ Revisão da Planta de Produção", rev1, key="revisao1")
     linha1 = sorted(dados[dados["PRODUTO"] == produto1]['LINHA DE PRODUÇÃO'].unique())
     linhaProd1 = st.multiselect("🕐 Linha de Produção", linha1, key="linhaProd1")
 
@@ -57,7 +57,7 @@ with col2:
     st.subheader("🧵 Produto 2")
     produto2 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto2")
     rev2 = sorted(dados[dados["PRODUTO"] == produto2]['REVISÃO'].unique())
-    revisao2 = st.selectbox("⚙️ Revisão", rev2, key="revisao2")
+    revisao2 = st.selectbox("⚙️ Revisão da Planta de Produção", rev2, key="revisao2")
     linha2 = sorted(dados[dados["PRODUTO"] == produto2]['LINHA DE PRODUÇÃO'].unique())
     linhaProd2 = st.multiselect("🕐 Linha de Produção", linha2, key="linhaProd2")
 
