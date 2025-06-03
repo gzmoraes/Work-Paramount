@@ -4,10 +4,13 @@ import altair as alt
 import os
 import io
 
+st.set_page_config(page_title="Diferença MQ/HR | Paramount Têxteis SI", layout="wide")
+
 # 🎨 Sidebar personalizada
 with st.sidebar: 
     st.subheader("ℹ️ Sobre")
     st.info("App desenvolvido para auxiliar na gestão da produção da unidade de Santa Isabel.")
+    st.markdown("---")
     st.markdown("Developed by Gustavo Moraes")
     st.markdown(
         """
@@ -23,7 +26,7 @@ with st.sidebar:
 
 
 # Configuração da página
-st.title("📊Produção - Paramount SI")
+st.title("Diferença MQ/HR | Produção - Paramount SI")
 
 # Função para carregar os dados
 @st.cache_data

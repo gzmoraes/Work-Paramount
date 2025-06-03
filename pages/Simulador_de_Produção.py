@@ -5,12 +5,13 @@ from datetime import datetime
 import io
 import os
 
-st.set_page_config(page_title="Produção - Paramount SI", layout="wide")
+st.set_page_config(page_title="Produção - Paramount Têxteis SI", layout="wide")
 
 # 🎨 Sidebar personalizada
 with st.sidebar: 
     st.subheader("ℹ️ Sobre")
     st.info("App desenvolvido para auxiliar na gestão da produção da unidade de Santa Isabel.")
+    st.markdown("---")
     st.markdown("Developed by Gustavo Moraes")
     st.markdown(
         """
@@ -25,7 +26,7 @@ with st.sidebar:
     )
 
 
-st.title("📊 Produção - Paramount SI")
+st.title("Produção - Paramount SI")
 
 # Carrega os dados da planilha Excel
 @st.cache_data

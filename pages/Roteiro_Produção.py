@@ -4,10 +4,13 @@ import altair as alt
 import os
 import io
 
+st.set_page_config(page_title="Roteiro | Paramount Têxteis SI", layout="wide")
+
 # 🎨 Sidebar personalizada
 with st.sidebar: 
     st.subheader("ℹ️ Sobre")
     st.info("App desenvolvido para auxiliar na gestão da produção da unidade de Santa Isabel.")
+    st.markdown("---")
     st.markdown("Developed by Gustavo Moraes")
     st.markdown(
         """
@@ -23,7 +26,7 @@ with st.sidebar:
 
 
 # Configuração da página
-st.title("📊Produção - Paramount SI")
+st.title("Roteriro de Produção - Paramount SI")
 
 # Função para carregar os dados
 @st.cache_data
@@ -41,7 +44,6 @@ dados["N° OPERAÇÃO"] = dados["N° OPERAÇÃO"].astype(str).str.strip()
 dados["N_ROTEIRO"] = dados["N_ROTEIRO"].astype(str).str.strip().str.upper()
 
 
-st.subheader("🧵 Produto 1")
 produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
 rev1 = sorted(dados[dados["PRODUTO"] == produto1]['REVISÃO'].unique())
 revisao1 = st.selectbox("⚙️ Revisão da Planta de Produção", rev1, key="revisao1")

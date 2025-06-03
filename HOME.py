@@ -23,16 +23,22 @@ with st.sidebar:
 # Conteúdo principal
 st.image("https://cdn-app-privally-io.s3.amazonaws.com/env/suite/images/treatment/central/0001/00000436/darkLogo/20210824193610.png", width= 700)
 
-st.subheader("👈 Selecione uma página no menu lateral")
+st.subheader("⬅️ Selecione uma página no menu lateral")
 
 st.markdown("""
 ### 📄 Descrição:
-Este aplicativo possui duas funcionalidades principais:
+Este aplicativo possui quatro funcionalidades principais:
 
-1. **🔍 Comparativo de Produção**  
+1. **Diferença de Maquina Hora**  
 Compare a produtividade de dois produtos distintos com base na quantidade de MAQ HR e KG/HR por operação.
 
-2. **🧮 Simulador de Produção**  
+2. **Diferença de Rendimento**                                                     
+Compare a produtividade de dois produtos distintos com base no rendimento(%) por operação.           
+            
+3. **Roteiro de Produção**                                                     
+Veja o roteiro de produção de acordo com o produto desejado.
+
+4. **Simulador de Produção**  
 Simule a quantidade de dias necessários para atingir uma meta de produção, considerando variáveis como quantidade de máquinas, fusos parados, turnos, pausas e eficiência.
 """)
 
