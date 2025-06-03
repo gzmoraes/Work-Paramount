@@ -78,8 +78,7 @@ colunas_exibir = [
 if tabela1.empty:
     st.warning("⚠️ Dados insuficientes para gerar o comparativo. Verifique se selecionou corretamente Produto, Revisão e Linha de Produção.")
 else:
-    st.subheader("🔍 Comparativo de MAQ HR por OPERAÇÃO")
-    st.write("(Ordem de N° de Operação está de acordo com o Produto 1)")
+    st.subheader(f"Roteiro de Prudução - {nome1}")
     st.dataframe(tabela1[colunas_exibir], hide_index=True)
 
     
