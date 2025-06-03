@@ -45,13 +45,13 @@ def parse_float(valor):
     return float(valor)
 
 # Seleção de quantidade de produtos
-qtd_produtos = st.selectbox("🛠️ Quantidade de produtos para comparar", [1, 2, 3])
+qtd_produtos = st.selectbox("Quantidade de produtos para comparar", [1, 2, 3])
 
 # Dias úteis
-diasMax = st.number_input("📆 Max Dias Úteis", min_value=1, max_value=31, step=1)
+diasMax = st.number_input("Max Dias Úteis", min_value=1, max_value=31, step=1)
 
 # Inputs adicionais globais
-st.subheader("⚙️ Ajustes Globais")
+st.subheader("Ajustes Globais")
 col1, col2 = st.columns(2)
 with col1:
     absenteismo = st.number_input("Índice de Absenteísmo (%)", min_value=0.0, max_value=100.0, value=0.0, step=1.0) / 100
@@ -60,7 +60,7 @@ with col2:
 
 # Função para inputs de produtos
 def input_produto(idx):
-    st.subheader(f"🧵 Produto {idx}")
+    st.subheader(f"Produto {idx}")
     produto = st.selectbox(f"Item", sorted(dados["PRODUTO"].unique()), key=f"produto{idx}")
     meta = st.number_input(f"Meta (kg)", min_value=1, step=1000, key=f"meta{idx}")
     operacoes = dados[dados["PRODUTO"] == produto]["OPERAÇÃO"].unique()
@@ -215,7 +215,7 @@ if st.button("🔍 Calcular Simulações"):
         dias_total = max([resultado["metricas"]["Dias"] if resultado else 0 for resultado in resultados])
         producao_total = sum(producao_dias)
 
-    st.subheader("🔢 Total de Produção Diária")
+    st.subheader("Total de Produção Diária")
     st.write("(Se as operações forem iguais, não soma a produção diária!)")
     st.metric(
         "", f"{producao_total:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " kg/dia"
