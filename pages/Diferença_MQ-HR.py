@@ -7,7 +7,7 @@ import io
 st.set_page_config(page_title="Diferença MQ/HR | Paramount Têxteis SI", layout="wide")
 
 # 🎨 Sidebar personalizada
-with st.sidebar: 
+with st.sidebar:
     st.subheader("ℹ️ Sobre")
     st.info("App desenvolvido para auxiliar na gestão da produção da unidade de Santa Isabel.")
     st.markdown("---")
@@ -24,8 +24,6 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-
-# Configuração da página
 st.title("Diferença MQ/HR | Produção - Paramount SI")
 
 # Função para carregar os dados
@@ -177,8 +175,8 @@ else:
         """
     )
 
-    # Gráfico
-    grafico = alt.Chart(comparativo).mark_bar().encode(
+    # Gráfico de Diferença Percentual
+    grafico_diferenca = alt.Chart(comparativo).mark_bar().encode(
         x=alt.X('OPERAÇÃO:N', sort=None, title='Operação'),
         y=alt.Y('Diferença (%) MAQ HR:Q', title='Diferença (%)'),
         color=alt.condition(
@@ -194,7 +192,35 @@ else:
         labelAngle=-45
     )
 
-    st.altair_chart(grafico, use_container_width=True)
+    st.subheader("📊 Gráfico de Diferença Percentual (MAQ HR)")
+    st.altair_chart(grafico_diferenca, use_container_width=True)
+
+    # Gráfico Comparativo Lado a Lado
+    dados_plot = comparativo.melt(
+        id_vars=['OPERAÇÃO', 'N° OPERAÇÃO'],
+        value_vars=[f'MAQ HR - {nome1}', f'MAQ HR - {nome2}'],
+        var_name='Produto',
+        value_name='MAQ HR'
+    )
+
+    dados_plot['Produto'] = dados_plot['Produto'].str.replace('MAQ HR - ', '')
+
+    grafico_comparativo = alt.Chart(dados_plot).mark_bar().encode(
+        x=alt.X('OPERAÇÃO:N', title='Operação'),
+        y=alt.Y('MAQ HR:Q', title='MAQ HR'),
+        color=alt.Color('Produto:N',
+                        scale=alt.Scale(range=['#28a745', '#dc3545']),
+                        legend=alt.Legend(title="Produto")),
+        tooltip=['OPERAÇÃO', 'Produto', 'MAQ HR']
+    ).properties(
+        width=1000,
+        height=400
+    ).configure_axis(
+        labelAngle=-45
+    )
+
+    st.subheader("📊 Gráfico Comparativo de MAQ HR por Operação")
+    st.altair_chart(grafico_comparativo, use_container_width=True)
 
     # Exportar Excel
     output = io.BytesIO()

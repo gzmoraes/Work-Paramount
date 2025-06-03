@@ -167,20 +167,23 @@ else:
     st.markdown(
         f"""
         #### ℹ️ Interpretação do Gráfico:
-        - Valores **positivos** indicam que o produto **{nome1}** consome mais MAQ HR que **{nome2}** na mesma operação.
-        - Valores **negativos** indicam que o produto **{nome1}** consome menos MAQ HR que **{nome2}**.
+        - Valores **positivos** indicam que o produto **{nome1}** tem mais rendimento que o produto **{nome2}** na mesma operação.
+        - Valores **negativos** indicam que o produto **{nome1}** tem menos rendimento que o produto **{nome2}** na mesma operação.
         """
     )
+    # Cria uma coluna auxiliar para definir se é positivo ou negativo
+    comparativo["Resultado"] = comparativo["Diferença (%) Rendimento"].apply(
+        lambda x: f'Produto {nome1}' if x >= 0 else f'Produto {nome2}'
+    )
 
-    # Gráfico
+    # Define o gráfico com legenda
     grafico = alt.Chart(comparativo).mark_bar().encode(
         x=alt.X('OPERAÇÃO:N', sort=None, title='Operação'),
         y=alt.Y('Diferença (%) Rendimento:Q', title='Diferença (%)'),
-        color=alt.condition(
-            alt.datum["Diferença (%) Rendimento"] > 0,
-            alt.value("#28a745"),  # verde
-            alt.value("#dc3545")   # vermelho
-        ),
+        color=alt.Color('Resultado:N',
+                    scale=alt.Scale(domain=[f'Produto {nome1}', f'Produto {nome2}'],
+                                    range=['#28a745', '#dc3545']),
+                    legend=alt.Legend(title="Resultado")),
         tooltip=['OPERAÇÃO', 'Diferença (%) Rendimento']
     ).properties(
         width=1000,
