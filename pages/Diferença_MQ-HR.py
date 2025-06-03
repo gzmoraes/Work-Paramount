@@ -162,9 +162,21 @@ else:
         diff_ponderada = round(diff_ponderada, 2)
     else:
         diff_ponderada = 0
+    
 
-    st.subheader("📌 Diferença Percentual Total (Ponderada)")
-    st.metric(label="Diferença Total (%)", value=f"{diff_ponderada}%")
+    coluna1, coluna2, coluna3 = st.columns(3)
+
+    with coluna1:
+        st.subheader(f"Total MQ/HR - {nome1}")
+        st.metric(label="Soma MQ/Hr", value=f"{soma_maq1:.2f}")
+
+    with coluna2:
+        st.subheader(f"Total MQ/HR - {nome2}")
+        st.metric(label="Soma MQ/Hr", value=f"{soma_maq2:.2f}")
+
+    with coluna3:
+        st.subheader("Diferença Percentual")
+        st.metric(label="Diferença Total (%)", value=f"{diff_ponderada}%")
 
     # Explicação do gráfico
     st.markdown(

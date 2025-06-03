@@ -57,10 +57,10 @@ filtro1 = dados[
 ][["OPERAÇÃO", "N° OPERAÇÃO", "N_ROTEIRO"]]
 
 
-# Renomear colunas
+
 nome1 = f"{produto1}"
 
-
+# Renomear colunas
 if not filtro1.empty:
     tabela1 = filtro1.rename(columns={
         "N_ROTEIRO": f"ROTEIRO - {nome1}"
