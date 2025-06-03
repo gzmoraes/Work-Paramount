@@ -48,7 +48,7 @@ dados_sem_nulos = dados[dados["LINHA DE PRODUÇÃO"].notna()]
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("🧵 Produto 1")
+    st.subheader("Produto 1")
     produto1 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto1")
     rev1 = sorted(dados[dados["PRODUTO"] == produto1]['REVISÃO'].unique())
     revisao1 = st.selectbox("Revisão da Planta de Produção", rev1, key="revisao1")
@@ -56,7 +56,7 @@ with col1:
     linhaProd1 = st.multiselect("Linha de Produção", linha1, key="linhaProd1")
 
 with col2:
-    st.subheader("🧵 Produto 2")
+    st.subheader("Produto 2")
     produto2 = st.selectbox("Item", sorted(dados["PRODUTO"].unique()), key="produto2")
     rev2 = sorted(dados[dados["PRODUTO"] == produto2]['REVISÃO'].unique())
     revisao2 = st.selectbox("Revisão da Planta de Produção", rev2, key="revisao2")
