@@ -130,7 +130,10 @@ comparativo["Diferença (%) MAQ HR"] = (
     (comparativo[f"MAQ HR - {nome1}"] - comparativo[f"MAQ HR - {nome2}"]) /
     comparativo[f"MAQ HR - {nome1}"].replace(0, pd.NA)
 ) * 100
-comparativo["Diferença (%) MAQ HR"] = comparativo["Diferença (%) MAQ HR"].round(2)
+import pandas as pd
+
+comparativo["Diferença (%) MAQ HR"] = pd.to_numeric(comparativo["Diferença (%) MAQ HR"], errors="coerce").round(2)
+
 
 # Ordenar
 comparativo = comparativo.sort_values(by=["N° OPERAÇÃO", "OPERAÇÃO"], ascending=True, na_position='last')
