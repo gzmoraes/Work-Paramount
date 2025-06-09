@@ -101,7 +101,7 @@ for idx, row in df.iterrows():
             almoco = st.radio(f"Almoço - {operacao}", ["Sim", "Não"], index=["Sim", "Não"].index(almoco), key=f"almoco_{idx}")
             pico = st.radio(f"Pico - {operacao}", ["Sim", "Não"], index=["Sim", "Não"].index(pico), key=f"pico_{idx}")
         with col3:
-            eficiencia = st.slider(f"Eficiência % - {operacao}", 1, 100, value=eficiencia, key=f"efi_{idx}")
+            eficiencia = st.number_input(f"Eficiência % - {operacao}", 1, 100, value=eficiencia, key=f"efi_{idx}")
             fusos_parados = st.number_input(
                 f"Fusos Parados - {operacao} - Total Fusos {total_fusos}",
                 min_value=0.0,
@@ -123,6 +123,10 @@ for idx, row in df.iterrows():
             "N° OPERAÇÃO": num_operacao,
             "OPERAÇÃO": operacao,
             "Turnos": ", ".join(turnos),
+            "Almoço": almoco,
+            "Pico": pico,
+            "Eficiência": eficiencia,
+            "Fusos Parados": fusos_parados,
             "Horas líquidas/dia": round(horas_liquidas, 2),
             "Máquinas": maquinas,
             "Horas Disponíveis (Total)": round(horas_disp, 2)
