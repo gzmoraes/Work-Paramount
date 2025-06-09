@@ -208,37 +208,41 @@ if resultados_produtos:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-# ---------------- COMPARAÇÃO: HORAS NECESSÁRIAS x HORAS DISPONÍVEIS ----------------
+# ---------------- COMPARAÇÃO FINAL: SOMA TOTAL DE HORAS NECESSÁRIAS x HORAS DISPONÍVEIS ----------------
 st.markdown("---")
-st.header("✅ Verificação de Viabilidade por OPERAÇÃO")
+st.header("✅ Verificação Final por OPERAÇÃO (Soma Total de Horas Necessárias)")
 
-# Merge das tabelas por operação
-df_checagem = pd.merge(df_produtos, df_resultado, on="OPERAÇÃO", how="left")
+# Agrupar horas necessárias por operação
+df_necessarias_agrupadas = df_produtos.groupby("OPERAÇÃO")["Horas Necessárias"].sum().reset_index()
+df_necessarias_agrupadas = df_necessarias_agrupadas.rename(columns={"Horas Necessárias": "Horas Necessárias (Total)"})
 
-# Subtrair as horas e verificar viabilidade
-df_checagem["Diferença (Disp - Nec)"] = df_checagem["Horas Disponíveis (Total)"] - df_checagem["Horas Necessárias"]
+# Merge com as horas disponíveis
+df_checagem = pd.merge(df_necessarias_agrupadas, df_resultado, on="OPERAÇÃO", how="left")
+
+# Cálculo da diferença e status
+df_checagem["Diferença (Disp - Nec)"] = df_checagem["Horas Disponíveis (Total)"] - df_checagem["Horas Necessárias (Total)"]
 df_checagem["Status"] = df_checagem["Diferença (Disp - Nec)"].apply(
     lambda x: "✅ Viável" if x >= 0 else "❌ Inválido"
 )
 
-# Organizar colunas para exibição
+# Exibição ordenada
 colunas_exibir = [
-    "Produto", "OPERAÇÃO", "Meta (ton)", "KG/MH",
-    "Horas Necessárias", "Horas Disponíveis (Total)",
+    "OPERAÇÃO", "Horas Necessárias (Total)", "Horas Disponíveis (Total)",
     "Diferença (Disp - Nec)", "Status"
 ]
-df_checagem = df_checagem[colunas_exibir]
+df_checagem = df_checagem[colunas_exibir].sort_values(by="OPERAÇÃO")
 
 st.dataframe(df_checagem, hide_index=True)
 
-# Exportar para Excel
+# Exportar resultado final
 output_checagem = io.BytesIO()
 with pd.ExcelWriter(output_checagem, engine="openpyxl") as writer:
-    df_checagem.to_excel(writer, index=False, sheet_name="Verificacao_Viabilidade")
+    df_checagem.to_excel(writer, index=False, sheet_name="Viabilidade_Final")
 output_checagem.seek(0)
 st.download_button(
-    "📥 Baixar Verificação de Viabilidade",
+    "📥 Baixar Verificação Final (Agrupada)",
     data=output_checagem,
-    file_name="verificacao_viabilidade.xlsx",
+    file_name="verificacao_final_viabilidade.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
+
