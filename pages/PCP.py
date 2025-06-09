@@ -54,7 +54,7 @@ def carregar_dados():
 df = carregar_dados()
 
 # Configurações gerais
-dias_uteis = st.number_input("Dias Úteis", min_value=1, value=22)
+dias_uteis = st.number_input("Dias Úteis", min_value=1, max_value=31, value=25)
 absenteismo_geral = st.number_input("Absenteísmo (%)", 0, 100, 5)
 novatos_geral = st.number_input("Novatos (%)", 0, 100, 10)
 
