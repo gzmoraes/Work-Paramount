@@ -53,16 +53,16 @@ CAMINHO_PLANILHA = os.path.join(
 @st.cache_data
 def carregar_dados():
     df = pd.read_excel(CAMINHO_PLANILHA)
-    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO"]].dropna()
+    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO", "FIAÇÃO"]].dropna()
     df["OPERAÇÃO"] = df["OPERAÇÃO"].astype(str).str.strip().str.upper()
     df["N° OPERAÇÃO"] = df["N° OPERAÇÃO"].astype(int)
+    df["FIAÇÃO"] = df["FIAÇÃO"].astype(str).str.strip().str.upper()
     
-    # Agrupar por operação, mantendo apenas o primeiro valor de N° FUSOS e KG/MH
     df_agrupado = (
         df.groupby("OPERAÇÃO")
         .agg({
-            "N° FUSOS": "first",    # pegar o primeiro valor de fusos
-            "KG/MH": "first"        # pegar o primeiro valor de KG/MH
+            "N° FUSOS": "first",
+            "KG/MH": "first"
         })
         .reset_index()
         .sort_values(by="OPERAÇÃO")
@@ -70,6 +70,14 @@ def carregar_dados():
     return df, df_agrupado
 
 df_raw, df = carregar_dados()
+
+st.markdown("---")
+fiações_disponíveis = df_raw["FIAÇÃO"].dropna().unique()
+fiação_selecionada = st.selectbox("Filtrar por FIAÇÃO", sorted(fiações_disponíveis))
+
+df_raw = df_raw[df_raw["FIAÇÃO"] == fiação_selecionada]
+df = df[df["OPERAÇÃO"].isin(df_raw["OPERAÇÃO"].unique())]
+
 
 # ---------------- CONFIGURAÇÕES GERAIS ----------------
 dias_uteis = st.number_input("Dias Úteis", min_value=1, max_value=31, value=25)
