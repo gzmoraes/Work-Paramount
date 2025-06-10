@@ -43,12 +43,11 @@ def carregar_dados():
     df_agrupado = (
         df.groupby("OPERAÇÃO")
         .agg({
-            "N° OPERAÇÃO": "min",   # pegar o menor número da operação
             "N° FUSOS": "first",    # pegar o primeiro valor de fusos
             "KG/MH": "first"        # pegar o primeiro valor de KG/MH
         })
         .reset_index()
-        .sort_values(by="N° OPERAÇÃO")
+        .sort_values(by="OPERAÇÃO")
     )
     return df, df_agrupado
 
@@ -66,7 +65,6 @@ resultados = []
 
 for idx, row in df.iterrows():
     operacao = row["OPERAÇÃO"]
-    num_operacao = row["N° OPERAÇÃO"]
     total_fusos = row["N° FUSOS"]
 
     turnos_padrao = ["A", "B", "C"]
@@ -121,7 +119,6 @@ for idx, row in df.iterrows():
         horas_disp = dias_uteis * horas_liquidas * fator_final * maquinas
 
         resultados.append({
-            "N° OPERAÇÃO": num_operacao,
             "OPERAÇÃO": operacao,
             "Turnos": ", ".join(turnos),
             "Almoço": almoco,
@@ -136,7 +133,7 @@ for idx, row in df.iterrows():
         })
 
 df_resultado = pd.DataFrame(resultados)
-df_resultado = df_resultado.sort_values(by="N° OPERAÇÃO")
+df_resultado = df_resultado.sort_values(by="OPERAÇÃO")
 
 st.subheader("Horas Disponiveis por Máquina")
 st.dataframe(df_resultado, hide_index=True)
