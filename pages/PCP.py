@@ -128,7 +128,7 @@ for idx, row in df.iterrows():
             "Pico": pico,
             "Eficiência %": eficiencia,
             "Fusos Parados": fusos_parados,
-            "Quantidade Máquinas": maquinas,
+            "Qntd Máquinas": maquinas,
             "Absenteismo %": absenteismo_geral,
             "Novatos %": novatos_geral,
             "Horas líquidas/dia": round(horas_liquidas, 2),
@@ -138,7 +138,7 @@ for idx, row in df.iterrows():
 df_resultado = pd.DataFrame(resultados)
 df_resultado = df_resultado.sort_values(by="N° OPERAÇÃO")
 
-st.subheader("📊 Resultado Final")
+st.subheader("Horas Disponiveis por Máquina")
 st.dataframe(df_resultado, hide_index=True)
 
 output = io.BytesIO()
@@ -152,7 +152,7 @@ st.download_button("📥 Baixar Resultado em Excel", data=output,
 
 # ---------------- NOVA FUNCIONALIDADE: META POR PRODUTO ----------------
 st.markdown("---")
-st.header("🎯 Cálculo de Horas Necessárias por Produto")
+st.header("Horas Necessárias por Produto")
 
 # Agrupar produtos disponíveis
 produtos_disponiveis = df_raw["PRODUTO"].drop_duplicates().tolist()
@@ -210,7 +210,7 @@ if resultados_produtos:
 
 # ---------------- COMPARAÇÃO FINAL: SOMA TOTAL DE HORAS NECESSÁRIAS x HORAS DISPONÍVEIS ----------------
 st.markdown("---")
-st.header("✅ Verificação Final por OPERAÇÃO (Soma Total de Horas Necessárias)")
+st.header("Verificação Final por Ocupação")
 
 # Agrupar horas necessárias por operação
 df_necessarias_agrupadas = df_produtos.groupby("OPERAÇÃO")["Horas Necessárias"].sum().reset_index()
@@ -224,12 +224,28 @@ df_checagem["Diferença (Disp - Nec)"] = df_checagem["Horas Disponíveis (Total)
 df_checagem["Status"] = df_checagem["Diferença (Disp - Nec)"].apply(
     lambda x: "✅ Viável" if x >= 0 else "❌ Inválido"
 )
+df_checagem["Ocupação (%)"] = ((df_checagem["Horas Necessárias (Total)"] / df_checagem["Horas Disponíveis (Total)"]) * 100).round(2)
+
 
 # Exibição ordenada
 colunas_exibir = [
-    "OPERAÇÃO", "Horas Necessárias (Total)", "Horas Disponíveis (Total)",
-    "Diferença (Disp - Nec)", "Status"
+    "OPERAÇÃO",
+    "Turnos",
+    "Almoço",
+    "Pico",
+    "Eficiência %", 
+    "Fusos Parados",
+    "Qntd Máquinas",
+    "Absenteismo %",
+    "Novatos %",
+    "Horas Disponíveis (Total)",
+    "Horas Necessárias (Total)",
+    "Diferença (Disp - Nec)",
+    "Ocupação (%)",
+    "Status"
 ]
+
+
 df_checagem = df_checagem[colunas_exibir].sort_values(by="OPERAÇÃO")
 
 st.dataframe(df_checagem, hide_index=True)
