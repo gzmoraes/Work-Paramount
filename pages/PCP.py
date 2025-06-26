@@ -53,10 +53,11 @@ CAMINHO_PLANILHA = os.path.join(
 @st.cache_data
 def carregar_dados():
     df = pd.read_excel(CAMINHO_PLANILHA)
-    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO", "FIAÇÃO"]].dropna()
+    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO", "FIAÇÃO", "LINHA DE PRODUÇÃO"]].dropna()
     df["OPERAÇÃO"] = df["OPERAÇÃO"].astype(str).str.strip().str.upper()
     df["N° OPERAÇÃO"] = df["N° OPERAÇÃO"].astype(int)
     df["FIAÇÃO"] = df["FIAÇÃO"].astype(str).str.strip().str.upper()
+    df["LINHA DE PRODUÇÃO"] = df["LINHA DE PRODUÇÃO"].astype(str).str.strip().str.upper()
     
     df_agrupado = (
         df.groupby("OPERAÇÃO")
@@ -78,6 +79,13 @@ fiação_selecionada = st.selectbox("Filtrar por FIAÇÃO", sorted(fiações_dis
 df_raw = df_raw[df_raw["FIAÇÃO"] == fiação_selecionada]
 df = df[df["OPERAÇÃO"].isin(df_raw["OPERAÇÃO"].unique())]
 
+#st.markdown("---")
+#linhas_producao_disponiveis = df_raw["LINHA DE PRODUÇÃO"].dropna().unique()
+#linha_producao_selecionada = st.multiselect("Filtrar por LINHA DE PRODUÇÃO", sorted(linhas_producao_disponiveis))
+
+# Filtrando os dados com base na linha de produção selecionada
+#df_raw = df_raw[df_raw["LINHA DE PRODUÇÃO"] == linha_producao_selecionada]
+#df = df[df["OPERAÇÃO"].isin(df_raw["OPERAÇÃO"].unique())]
 
 # ---------------- CONFIGURAÇÕES GERAIS ----------------
 dias_uteis = st.number_input("Dias Úteis", min_value=1, max_value=31, value=25)
