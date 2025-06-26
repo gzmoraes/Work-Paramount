@@ -53,7 +53,7 @@ CAMINHO_PLANILHA = os.path.join(
 @st.cache_data
 def carregar_dados():
     df = pd.read_excel(CAMINHO_PLANILHA)
-    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO", "FIAÇÃO", "LINHA DE PRODUÇÃO"]].dropna()
+    df = df[["N° OPERAÇÃO", "OPERAÇÃO", "N° FUSOS", "KG/MH", "PRODUTO", "FIAÇÃO", "LINHA DE PRODUÇÃO", "REVISÃO"]].dropna()
     df["OPERAÇÃO"] = df["OPERAÇÃO"].astype(str).str.strip().str.upper()
     df["N° OPERAÇÃO"] = df["N° OPERAÇÃO"].astype(int)
     df["FIAÇÃO"] = df["FIAÇÃO"].astype(str).str.strip().str.upper()
@@ -185,17 +185,26 @@ st.download_button("📥 Baixar Resultado em Excel", data=output,
 st.markdown("---")
 st.header("Horas Necessárias por Produto")
 
-# Agrupar produtos disponíveis
-produtos_disponiveis = df_raw["PRODUTO"].drop_duplicates().tolist()
+# Agrupar produtos e revisões disponíveis
+produtos_revisoes = df_raw[["PRODUTO", "REVISÃO"]].drop_duplicates()
 
 num_produtos = st.number_input("Quantidade de Produtos a Simular", min_value=1, max_value=30, value=1, step=1)
 
 produtos_selecionados = []
 for i in range(int(num_produtos)):
     with st.expander(f"🛠️ Produto {i+1}"):
-        produto = st.selectbox(f"Selecione o Produto - Produto {i+1}", produtos_disponiveis, key=f"produto_{i}")
+        produto = st.selectbox(f"Selecione o Produto - Produto {i+1}", sorted(produtos_revisoes["PRODUTO"].unique()), key=f"produto_{i}")
+
+        revisoes_disponiveis = produtos_revisoes[produtos_revisoes["PRODUTO"] == produto]["REVISÃO"].unique()
+        revisao = st.selectbox(f"Selecione a Revisão - Produto {i+1}", sorted(revisoes_disponiveis), key=f"revisao_{i}")
+
         meta_ton = st.number_input(f"Meta de Produção (toneladas) para Produto {i+1}", min_value=0.0, step=1.0, key=f"meta_{i}")
-        produtos_selecionados.append({"Produto": produto, "Meta_ton": meta_ton})
+
+        produtos_selecionados.append({
+            "Produto": produto,
+            "Revisao": revisao,
+            "Meta_ton": meta_ton
+        })
 
 # Calcular horas necessárias
 resultados_produtos = []
@@ -204,7 +213,7 @@ for produto_info in produtos_selecionados:
     produto = produto_info["Produto"]
     meta = produto_info["Meta_ton"]
 
-    df_filtrado = df_raw[df_raw["PRODUTO"] == produto]
+    df_filtrado = df_raw[(df_raw["PRODUTO"] == produto) & (df_raw["REVISÃO"] == revisao)]
 
     for _, row in df_filtrado.iterrows():
         operacao = row["OPERAÇÃO"]
